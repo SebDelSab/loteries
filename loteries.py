@@ -46,10 +46,6 @@ def proba(lines,col_dic,f_col,nb_b):
 		col_dic[k] = col_dic[k]/tot_tirages
 	return(col_dic)
 
-
-		# if col_dic[k] < 1/nbboules :                                 
-		# 	dmin_b1[k] = dico_col1[k]
-
 def number_choice(col_dic,nb_b,tir):
 	dmin = {}
 	for k in col_dic.keys():
@@ -59,9 +55,6 @@ def number_choice(col_dic,nb_b,tir):
 	while(b in tir):
 		b = random.choice(list(dmin.keys()))
 	return(b)
-
-
-	
 
 #################################
 ########  Main program  #########
@@ -105,10 +98,6 @@ for i in l2:
 # première boule # 
 ##################
 
-##########################################
-# première boule : traitement du tableau # 
-##########################################
-
 ###########################################################
 # Je pars du principe qu'on tend vers l'équilibre         #
 # on choisira donc la boule parmi les nombres qui tombent #
@@ -127,10 +116,6 @@ tirage.append(boule_1)
 ##################
 # deuxième boule # 
 ##################
-
-##########################################
-# deuxième boule : traitement du tableau # 
-##########################################
 
 dico_col2 = proba(lines,dico_col2,first_col+1,nbboules-1)
 
@@ -282,7 +267,6 @@ elif euOrlo[2] == "loto":
 
 '''
 
-- readme
 - Tout en anglais
 - Ne pas faire de tirage quand en mode analyse
 - Rajouter les plus
