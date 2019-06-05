@@ -2,13 +2,9 @@ import random
 import sys
 
 #################################
-#####  Arguments function  ######
+#####      Functions       ######
 #################################
 
-nbboules = 0
-first_col = 0
-nbboules_c = 0
-frequencies = []
 def get_arg():
 	arg_l=[]
 	for arg in sys.argv: 
@@ -56,10 +52,97 @@ def number_choice(col_dic,nb_b,tir):
 		b = random.choice(list(dmin.keys()))
 	return(b)
 
-#################################
-########  Main program  #########
-#################################
+def f_analysis(nbboules,nbboules_c,game,d1,d2,d3,d4,d5,de1,de2):
+	#print("analysis mode launched")
+	frequencies = []
+	frequencies_bonus = []		
+	print("première boule : ")
+	res_1 = input()
+	print("deuxième boule : ")
+	res_2 = input()
+	print("troisème boule : ")
+	res_3 = input()
+	print("quatrième boule : ")
+	res_4 = input()
+	print("cinquième boule : ")
+	res_5 = input()
+	test_combi = []
+	test_combie = []
+	if game == True:
+		frequencies.extend((d1,d2,d3,d4,d5))
+		frequencies_bonus.extend((de1,de2))
+		print("première étoile : ")
+		eto_1 = input()
+		print("deuxième étoile : ")
+		eto_2 = input()
+		test_combi.extend((res_1,res_2,res_3,res_4,res_5))
+		test_combie.extend((eto_1,eto_2))
+		i=0
+		j=0
+		while i<len(test_combi):
+			if(frequencies[i][int(test_combi[i])]>1/(nbboules-i)):							
+				print(test_combi[i] + " fait partie de ceux qui sortent le plus")
+			else:
+				print(test_combi[i] + " fait partie de ceux qui sortent le moins")
+			i = i+1
+		while j<len(test_combie):
+			if(frequencies_bonus[j][int(test_combie[j])]>1/(nbboules_c-j)):							
+				print(test_combie[j] + " fait partie de ceux qui sortent le plus")
+			else:
+				print(test_combie[j] + " fait partie de ceux qui sortent le moins")
+			j = j+1			
+	elif game == False:
+		frequencies.extend((d1,d2,d3,d4,d5))
+		print("numéro chance : ")
+		num_cha = input()
+		test_combi.extend((res_1,res_2,res_3,res_4,res_5))
+		i = 0
+		while i<len(test_combi):
+			if(frequencies[i][int(test_combi[i])]>1/(nbboules-i)):							
+				print(test_combi[i] + " fait partie de ceux qui sortent le plus")
+			else:
+				print(test_combi[i] + " fait partie de ceux qui sortent le moins")
+			i = i+1
+		if(de1[int(num_cha)]>1/(nbboules_c-i)):			
+			print(num_cha + " fait partie de ceux qui sortent le plus")
+		else:
+			print(num_cha + " fait partie de ceux qui sortent le moins")
 
+def draw(nbboules,nbboules_c,df1,df2,df3,df4,df5,df6,df7,booli):
+	tirage = []
+	tirage_e = []
+	boule_1 = number_choice(df1,nbboules,tirage)
+	tirage.append(boule_1)
+	boule_2 = number_choice(df2,nbboules-1,tirage)
+	tirage.append(boule_2)
+	boule_3 = number_choice(df3,nbboules-2,tirage)
+	tirage.append(boule_3)
+	boule_4 = number_choice(df4,nbboules-3,tirage)
+	tirage.append(boule_4)
+	boule_5 = number_choice(df5,nbboules-4,tirage)
+	tirage.append(boule_5)
+	boule_e1 = number_choice(df6,nbboules_c,tirage_e)
+	tirage_e.append(boule_e1)
+	if booli == True:
+		boule_e2 = number_choice(df7,nbboules_c-1,tirage_e)
+		tirage_e.append(boule_e2)
+	print("Tirage proposé :\n"+str(tirage[0])+"-"+str(tirage[1])+"-"+str(tirage[2])+"-"+str(tirage[3])+"-"+str(tirage[4]))
+	if booli == True:
+		print("étoiles : "+str(tirage_e[0])+"-"+str(tirage_e[1]))
+	else:
+		print("numéro chance : "+str(tirage_e[0]))
+
+
+###############################################
+########  Main program initialization #########
+###############################################
+
+nbboules = 0
+first_col = 0
+nbboules_c = 0
+euro = False
+analysis = False
+simulation = False
 game = input_file()
 f=open(game,"r")
 content = f.read()
@@ -74,11 +157,16 @@ dico_col3 = {}
 dico_col4 = {}
 dico_col5 = {}
 dico_cole1 = {}
-dico_cole2 = {} 
-tirage = []
-tirage_e = []
-tot_tirages = len(lines)
+dico_cole2 = {}
 
+program_args = get_arg()
+if program_args[2] == "euromillions":
+	euro = True
+if program_args[3] == "analysis":	 
+	analysis = True
+elif program_args[3] == "simulation":
+	simulation = True
+tot_tirages = len(lines)
 
 l = range(1,nbboules + 1) 
 for i in l:
@@ -94,176 +182,67 @@ for i in l2:
 	dico_cole2[i] = 0 
 
 
-##################
-# première boule # 
-##################
-
-###########################################################
-# Je pars du principe qu'on tend vers l'équilibre         #
-# on choisira donc la boule parmi les nombres qui tombent #
-# le moins                                                #
-###########################################################
+##########################
+# first ball dictionnary # 
+##########################
 
 dico_col1=proba(lines,dico_col1,first_col,nbboules)
 
-##########################################
-# première boule : choix du nombre       # 
-##########################################
 
-boule_1 = number_choice(dico_col1,nbboules,tirage)
-tirage.append(boule_1)
-
-##################
-# deuxième boule # 
-##################
+###########################
+# second ball dictionnary # 
+###########################
 
 dico_col2 = proba(lines,dico_col2,first_col+1,nbboules-1)
 
-##########################################
-# deuxième boule : choix du nombre       # 
-##########################################
-
-boule_2 = number_choice(dico_col2,nbboules-1,tirage)
-tirage.append(boule_2)
-
-###################
-# troisième boule # 
-###################
+##########################
+# third ball dictionnary # 
+##########################
 
 dico_col3=proba(lines,dico_col3,first_col+2,nbboules-2)
 
-##########################################
-# troisème boule : choix du nombre       # 
-##########################################
+###########################
+# fourth ball dictionnary # 
+###########################
 
-boule_3 = number_choice(dico_col3,nbboules-2,tirage)
-tirage.append(boule_3)
-
-###################
-# quatrième boule # 
-###################
-
-dmin_b4 = {}
 dico_col4=proba(lines,dico_col4,first_col+3,nbboules-3)
 
-# ##########################################
-# # quatrième boule : choix du nombre      # 
-# ##########################################
 
-boule_4 = number_choice(dico_col4,nbboules-3,tirage)
-tirage.append(boule_4)
-
-###################
-# cinquième boule # 
-###################
+###########################
+#### fifth dictionnary #### 
+###########################
 
 dico_col5=proba(lines,dico_col5,first_col+4,nbboules-4)
 
-##########################################
-# cinquième boule : choix du nombre      # 
-##########################################
 
-boule_5 = number_choice(dico_col5,nbboules-4,tirage)
-tirage.append(boule_5)
-
-
-#####################
-# Première étoile   # 
-#####################
+###########################
+# First star dictionnary  # 
+###########################
 
 dico_cole1 = proba(lines,dico_cole1,first_col+5,nbboules_c)
 
-##########################################
-# première étoile : choix du nombre      # 
-##########################################
-
-boule_e1 = number_choice(dico_cole1,nbboules_c,tirage_e)
-tirage_e.append(boule_e1)
-
-#####################
-# Deuxième étoile   # 
-#####################
+#############################
+# Second star dictionnary   # 
+#############################
 
 
 euOrlo = get_arg()
 
-if euOrlo[2] == "euromillions":
+if euro == True:
 	dico_cole2 = proba(lines,dico_cole2,first_col+6,nbboules_c-1)
 
-##########################################
-# deuxième étoile : choix du nombre      # 
-##########################################
+######################
+###  Main programm ###
+######################
 
-	boule_e2 = number_choice(dico_cole2,nbboules_c-1,tirage_e)
-	tirage_e.append(boule_e2)
-
-
-
-
-############
-# Résultat # 
-############
-
-print("Tirage proposé :\n"+str(tirage[0])+"-"+str(tirage[1])+"-"+str(tirage[2])+"-"+str(tirage[3])+"-"+str(tirage[4]))
-if euOrlo[2] == "euromillions":
-	print("étoiles : "+str(tirage_e[0])+"-"+str(tirage_e[1]))
-elif euOrlo[2] == "loto":
-	print("numéro chance : "+str(tirage_e[0]))
-
-
-
-#########################################
-# Vérification de l'hypothèse de départ # 
-#########################################
-
-
-# if len(euOrlo)>3:
-# 	if euOrlo[3] == "-opt":
-# 		if len(euOrlo)>4 and euOrlo[4] == "analyse":
-#  			print("première boule : ")
-#  			res_1 = input()
-#  			print("deuxième boule : ")
-#  			res_2 = input()
-#  			print("troisème boule : ")
-#  			res_3 = input()
-#  			print("quatrième boule : ")
-#  			res_4 = input()
-#  			print("cinquième boule : ")
-#  			res_5 = input()
-#  			tirage_vrai = []
-#  			if euOrlo[2] == "euromillions":
-#  				frequencies.extend((dico_col1,dico_col2,dico_col3,dico_col4,dico_col5,dico_cole1,dico_cole2))
-#  				print("première étoile : ")
-#  				eto_1 = input()
-#  				print("deuxième étoile : ")
-#  				eto_2 = input()
-#  				tirage_vrai.extend((res_1,res_2,res_3,res_4,res_5,eto_1,eto_2))
-#  				print(tirage_vrai)
-#  				i=0
-#  				while i<len(tirage_vrai):
-#  					if(frequencies[i][int(tirage_vrai[i])]>1/(nbboules-i)):							
-#  						print(tirage_vrai[i] + " fait partie de ceux qui sortent le plus")
-#  					else:
-#  						print(tirage_vrai[i] + " fait partie de ceux qui sortent le moins")
-#  					i = i+1
-#  			elif euOrlo[2] == "loto":
-#  				frequencies.extend((dico_col1,dico_col2,dico_col3,dico_col4,dico_col5,dico_cole1))
-#  				print("numéro chance : ")
-#  				num_cha = input()
-#  				tirage_vrai.extend((res_1,res_2,res_3,res_4,res_5,num_cha))
-#  				print(tirage_vrai)
-#  				while i<len(tirage_vrai):
-#  					if(frequencies[i][int(tirage_vrai[i])]>1/(nbboules-i)):							
-#  						print(tirage_vrai[i] + " fait partie de ceux qui sortent le plus")
-#  					else:
-#  						print(tirage_vrai[i] + " fait partie de ceux qui sortent le moins")
-#  					i = i+1				
-
-
+if simulation == True:
+	draw(nbboules,nbboules_c,dico_col1,dico_col2,dico_col3,dico_col4,dico_col5,dico_cole1,dico_cole2,euro)
+if analysis == True:
+	f_analysis(nbboules,nbboules_c,euro,dico_col1,dico_col2,dico_col3,dico_col4,dico_col5,dico_cole1,dico_cole2)
 ##############
 ##   To do  ##
-##############
-
+#############
+print(dico_cole1)
 
 '''
 
@@ -273,7 +252,10 @@ elif euOrlo[2] == "loto":
 - Création d'un fichier d'analyse :
 	- info sur la proba du numéro qui est sorti
 	- nombre de fois qu'un numéro sorti à fait partie des plus ou des moins
-	- 
+- Ajouter sécurité sur les arguments
+- essayer de faire sans les while et les répétitions dans analysis
+- fonction update
+
 
 
 
